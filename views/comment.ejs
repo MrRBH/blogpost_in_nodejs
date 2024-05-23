@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+        crossorigin="anonymous" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        .second {
+            width: 450px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 10px 10px 5px #aaaaaa;
+        }
+
+        .text1 {
+            font-size: 13px;
+            font-weight: 500;
+            color: #56575b;
+        }
+
+        .text2 {
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 6px;
+            color: #56575b;
+        }
+
+        .text3 {
+            font-size: 13px;
+            font-weight: 500;
+            margin-right: 4px;
+            color: #828386;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <section>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-5 col-sm-4 offset-md-1 offset-sm-1 col-12 mt-4">
+                        <!-- Comment Form -->
+                        <form>
+                            <div class="form-group">
+                                <h4>Leave a comment</h4>
+                                <label for="comment">Comment:</label>
+                                <textarea name="comment" cols="30" rows="5" class="form-control" id="commentInput"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary mt-1">Post Comment</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-sm-5 col-md-6 col-12 pb-4">
+                        <!-- Display Comments -->
+                        <div class="d-flex justify-content-center py-2">
+                            <div class="second py-2 px-2">
+                                <div class="d-flex justify-content-between py-1 pt-2">
+                                    <div>
+                                        <img src="https://i.imgur.com/tPvlEdq.jpg" width="18">
+                                        <span class="text2">John Doe</span>
+                                    </div>
+                                    <p>This is a dummy comment.</p>
+                                    <div>
+                                        <span class="text3">21 May, 2024</span>
+                                        <i class="fa fa-thumbs-o-up"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center py-2">
+                            <div class="second py-2 px-2">
+                                <div class="d-flex justify-content-between py-1 pt-2">
+                                    <div>
+                                        <img src="https://i.imgur.com/tPvlEdq.jpg" width="18">
+                                        <span class="text2">Jane Smith</span>
+                                    </div>
+                                    <p>This is another dummy comment.</p>
+                                    <div>
+                                        <span class="text3">20 May, 2024</span>
+                                        <i class="fa fa-thumbs-o-up"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Add more dummy comments as needed -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>

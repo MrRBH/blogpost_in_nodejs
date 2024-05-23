@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title> RB-Blogs </title>
+    <%- include('./partials/head')%>
+</head>
+
+<body>
+    <%- include('./partials/navbar')%>
+
+    <br>
+    <br>
+
+    <div class="container mt-2 ">
+        <div class="row row-col-2 ">
+         
+
+            <div class="col">
+                <img src="/<%= blog.CoverImage %>" >
+                
+                <h5 class="card-title"><%= blog.title %></h5>
+                <pre class="card-text"><%= blog.body %></pre>
+                <p><%= blog.role %></p>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/script')%>
+
+</body>
+
+</html>

@@ -1,21 +1,41 @@
-const express = require('express');
-const path = require('path'); // Require path for path.resolve
+const express = require("express");
+const path = require("path");
+const mongoose = require("mongoose");
 const userRouter = require("./routes/user");
-const { default: mongoose } = require('mongoose');
-const e = require('express');
+const blogRouter = require("./routes/blog");
+const commentRouter = require("./routes/comment");
+const cookieParser = require("cookie-parser");
+const { checkForAuthenticationCookie } = require("./middlewares/authentication");
+const Blog = require("./models/blog");
+
 const app = express();
 const PORT = 4000;
 
-//connection
-mongoose.connect("mongodb://127.0.0.1:27017/RB-blogs").then(e=>console.log('mongo db connected'));
-app.use(express.urlencoded({extended:false}))
+// Connect to MongoDB
+mongoose.connect("mongodb://127.0.0.1:27017/RB-blogs")
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Middleware
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
+app.use(checkForAuthenticationCookie('authToken'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+// Set up EJS for templating
 app.set('view engine', 'ejs');
-app.set('views', path.resolve('./views')); // Correct the views directory setting
-app.use('/user/',userRouter);
-app.get('/', (req, res) => {
-    res.render('home');
+app.set('views', path.resolve('./views'));
+
+// Routes
+app.use('/user', userRouter);
+app.use('/blog', blogRouter);
+app.use('/comment', commentRouter);
+app.get('/', async(req, res) => {
+  const allblog = await Blog.find({})
+  res.render('home', { user: req.user,blogs:allblog } );
 });
 
-app.listen(PORT, () => { // Corrected app.listen and the callback function
-    console.log(`Server started at port: ${PORT}`);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server started at port: ${PORT}`);
 });
