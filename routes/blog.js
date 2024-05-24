@@ -3,6 +3,7 @@ const router = Router();
 const path = require('path');
 const multer = require('multer');
 const Blog = require("../models/blog");
+const Comment = require("../models/Comment");
 // router.use(express.static(path.resolve("./public/")))
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -33,15 +34,34 @@ router.post("/", upload.single('uploadImage'), async(req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const blog = await Blog.findById(req.params.id);
+        const comments = await Comment.find({ blogId: req.params.id }).populate(
+            "userId"
+          );
         console.log(blog);
         if (!blog) {
             return res.status(404).send('Blog post not found');
         }
-        res.render('viewblog', { user: req.user, blog }); // Pass a single blog post
+        res.render('viewblog', { user: req.user, blog ,comments}); // Pass a single blog post
     } catch (error) {
         console.error('Error fetching blog:', error);
         res.status(500).send('Server Error');
     }
 });
+ //Comment routes
+ router.post("/comment/:blogId", async (req, res) => {
+    try {
+        await Comment.create({
+            content: req.body.content,
+            blogId: req.params.blogId,
+            userId: req.user._id,
+        });
+        return res.redirect(`/blog/${req.params.blogId}`);
+    } catch (error) {
+        console.error('Error creating comment:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
 
 module.exports = router;
+ 
