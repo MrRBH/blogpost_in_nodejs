@@ -47,7 +47,7 @@
 <body>
     <%- include('./partials/navbar') %>
     <div class="container mt-5">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center"> 
             <div class="col-md-6 form-container">
                 <form action="/blog" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
@@ -61,6 +61,31 @@
                     <div class="mb-3">
                         <label for="image" class="form-label">Choose an image:</label>
                         <input type="file" class="form-control" name="uploadImage" id="image" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="categories" class="form-label">Categories:</label>
+                        <select name="categories" id="categories" class="form-control">
+                           
+                                <option>programming</option>
+                                <option>Machine Learning</option>
+                                <option>Brands</option>
+                                <option>Aperal</option>
+                                <option>Sports</option>
+                          
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Active</label>
+                        <select name="Active" id="Active" class="form-control">
+                      
+                                <option>Publish</option>
+                                <option>Not Publish</option>
+                            
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Tags</label>
+                        <input type="text" class="form-control" name="tags" id="tags" placeholder="Tags for post..." required />
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn submit-button">Submit</button>

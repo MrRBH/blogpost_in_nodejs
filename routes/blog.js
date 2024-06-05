@@ -52,7 +52,7 @@ router.get('/:id', async (req, res) => {
     try {
         await Comment.create({
             content: req.body.content,
-            blogId: req.params.blogId,
+            blogId: req.params.blogId, 
             userId: req.user._id,
         });
         return res.redirect(`/blog/${req.params.blogId}`);

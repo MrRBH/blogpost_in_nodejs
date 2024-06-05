@@ -13,6 +13,18 @@ const blogSchema = new Schema({
         type: String,
         required: false,
     },
+    categories:{
+        type:String,
+        required:true
+    },
+    Active:{
+        type:String,
+        required:true
+    }, 
+    tags:{
+        type:String,
+        required:true
+    },
     userid: {
         type: Schema.Types.ObjectId,
         ref: 'user'

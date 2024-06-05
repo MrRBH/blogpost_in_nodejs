@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const User = require("../models/user");
-const { authenticateToken } = require("../middlewares/authentication");
+require("../middlewares/authentication");
 
 const router = Router();
 
@@ -25,9 +25,9 @@ router.post("/signin", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { fullname, email, password } = req.body;
   await User.create({
-    fullName,
+    fullname,
     email,
     password,
   });
