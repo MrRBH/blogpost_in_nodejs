@@ -3,15 +3,10 @@
 
 <head>
     <title>Blog Form</title>
-    <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    <!-- Bootstrap CSS v5.3.2 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-    
-    <!-- Custom CSS -->
     <style>
         body {
             background-color: #f8f9fa;
@@ -47,45 +42,46 @@
 <body>
     <%- include('./partials/navbar') %>
     <div class="container mt-5">
-        <div class="row justify-content-center"> 
+        <div class="row justify-content-center">
             <div class="col-md-6 form-container">
                 <form action="/blog" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title:</label>
-                        <input type="text" class="form-control" name="title" id="title" placeholder="Enter the blog title" required />
+                        <input type="text" class="form-control" name="title" id="title"
+                            placeholder="Enter the blog title" required />
                     </div>
                     <div class="mb-3">
                         <label for="body" class="form-label">Body:</label>
-                        <textarea class="form-control" name="body" id="body" rows="5" placeholder="Write your blog content here" required></textarea>
+                        <textarea class="form-control" name="body" id="body" rows="5"
+                            placeholder="Write your blog content here" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">Choose an image:</label>
                         <input type="file" class="form-control" name="uploadImage" id="image" required />
                     </div>
                     <div class="mb-3">
-                        <label for="categories" class="form-label">Categories:</label>
-                        <select name="categories" id="categories" class="form-control">
-                           
-                                <option>programming</option>
-                                <option>Machine Learning</option>
-                                <option>Brands</option>
-                                <option>Aperal</option>
-                                <option>Sports</option>
-                          
+                        <label for="categories" class="form-label">Category:</label>
+                        <select class="form-control" id="categories" name="categories" required>
+                            <option value="">Select category</option>
+                            <option value="Frontend">Frontend</option>
+                            <option value="Backend">Backend</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                            <option value="Ui/ux">Ui/ux</option>
+                            <option value="Brands">Brands</option>
                         </select>
+
                     </div>
                     <div class="mb-3">
-                        <label for="image" class="form-label">Active</label>
+                        <label for="Active" class="form-label">Active</label>
                         <select name="Active" id="Active" class="form-control">
-                      
-                                <option>Publish</option>
-                                <option>Not Publish</option>
-                            
+                            <option>Publish</option>
+                            <option>Not Publish</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="image" class="form-label">Tags</label>
-                        <input type="text" class="form-control" name="tags" id="tags" placeholder="Tags for post..." required />
+                        <label for="tags" class="form-label">Tags</label>
+                        <input type="text" class="form-control" name="Tags" id="tags" placeholder="Tags for post..."
+                            required />
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn submit-button">Submit</button>

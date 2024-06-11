@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, default: mongoose } = require('mongoose');
 const { schema } = require('./user');
 const blogSchema = new Schema({
     title: {
@@ -14,6 +14,11 @@ const blogSchema = new Schema({
         required: false,
     },
     categories:{
+      type:String,
+      required : true ,
+      unique:true
+    },
+    Tags:{
         type:String,
         required:true
     },
@@ -21,10 +26,6 @@ const blogSchema = new Schema({
         type:String,
         required:true
     }, 
-    tags:{
-        type:String,
-        required:true
-    },
     userid: {
         type: Schema.Types.ObjectId,
         ref: 'user'

@@ -8,8 +8,11 @@
     <%- include('./partials/navbar') %>
 
     <div class="container mt-4">
+      <div class="d-flex justify-content-center">
+
+        <img src="/<%= blog.CoverImage %>" width="70%" />
+      </div>
       <h1><%= blog.title %></h1>
-      <img src="/<%= blog.CoverImage %>" width="700px" />
       <pre class="mt-3"><%= blog.body %></pre>
     </div>
 
@@ -53,7 +56,7 @@
                 <div class="d-flex flex-row align-items-center">
                   <p class="small text-muted mb-0"><%= comment.createdAt.toLocaleString() %></p>
                   <i class="far fa-thumbs-up mx-2 fa-xs text-body" style="margin-top: -0.16rem;"></i>
-                  <p class="small text-muted mb-0">3</p>
+                
                 </div>
               </div>
             </div>
