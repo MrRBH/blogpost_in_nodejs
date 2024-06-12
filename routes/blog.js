@@ -79,6 +79,27 @@ router.post("/comment/:blogId", async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+// router.delete("/commentdelete/:commentId", async (req, res) => {
+//     try {
+//         const { commentId } = req.params;
+//         const comment = await Comment.findByIdAndDelete(commentId);
+
+//         console.log('DELETE request received for comment:', req.params.commentId);
+
+//         if (!comment) {
+//             return res.status(404).send({ msg: "Comment not found!" });
+//         }
+
+//         console.log('Comment deleted:', commentId);
+
+//         // Redirect back to the blog page after deleting the comment
+//         res.redirect(`/blog/${comment.blogId}`);
+//     } catch (error) {
+//         console.error('Error deleting comment:', error);
+//         res.status(500).send('Comment Not Deleted');
+//     }
+// });
+
 router.post("/category/:blogId",async(req,res)=>{
     try {
         const category =  await Category.create({
