@@ -1,70 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <%- include('./partials/head') %>
     <title>Blog</title>
-  </head>
-  <body>
+</head>
+<body>
     <%- include('./partials/navbar') %>
 
     <div class="container mt-4">
-      <div class="d-flex justify-content-center">
-
-        <img src="/<%= blog.CoverImage %>" width="70%" />
-      </div>
-      <h1><%= blog.title %></h1>
-      <pre class="mt-3"><%= blog.body %></pre>
+        <div class="d-flex justify-content-center">
+            <img src="/<%= blog.CoverImage %>" width="70%" />
+        </div>
+        <h1><%= blog.title %></h1>
+        <pre class="mt-3"><%= blog.body %></pre>
     </div>
 
-    <div class="container mt-4">
-    
-    </div>
+    <div class="container mt-4"></div>
 
     <div class="container mt-3">
-      
-      <% if (locals.user) { %>
-      <form action="/blog/comment/<%= blog.id %>" method="post">
-        <div class="mb-3 col-md-4">
-          <input
-            type="text"
-            name="content"
-            class="form-control"
-            placeholder="Enter your comment"
-          />
-          <button class="btn btn-sm btn-primary mt-1" type="submit">Add</button>
-        </div>
-      </form>
-
-      <% } %>
-      <div class="mt-3">
-        <% comments.forEach(comment => { %>
-        <!-- <div>
-          <img src="" width="50px" />
-          <%= comment.userId %>
-          <pre><%= comment.content %></pre>
-        </div> -->
-        <div class="card mb-4 col-md-4">
-            <div class="card-body">
-              <pre><%= comment.content %></pre>
-  
-              <div class="d-flex justify-content-between">
-                <div class="d-flex flex-row align-items-center">
-                  <img src="https://i.imgur.com/tPvlEdq.jpg" alt="avatar" width="25"
-                    height="25" />
-          
-                </div>
-                <div class="d-flex flex-row align-items-center">
-                  <p class="small text-muted mb-0"><%= comment.createdAt.toLocaleString() %></p>
-                  <i class="far fa-thumbs-up mx-2 fa-xs text-body" style="margin-top: -0.16rem;"></i>
-                
-                </div>
-              </div>
+        <% if (locals.user) { %>
+        <form action="/blog/comment/<%= blog.id %>" method="post">
+            <div class="mb-3 col-md-4">
+                <input type="text" name="content" class="form-control" placeholder="Enter your comment" />
+                <button class="btn btn-sm btn-success  mt-1" type="submit">comment</button>
             </div>
-          </div>
-        <% }) %>
-      </div>
+        </form>
+        <% } %>
+        <div class="mt-3">
+            <% comments.forEach(comment => { %>
+            <div class="card mb-4 col-md-4" id="comment-<%= comment._id %>">
+                <div class="card-body">
+                    <pre class="comment-content"><%= comment.content %></pre>
+                    <input type="text" class="form-control update-input d-none" value="<%= comment.content %>"/>
+                    <div class="d-flex justify-content-between mt-2">
+                        <div class="d-flex flex-row align-items-center">
+                            <img src="https://i.imgur.com/tPvlEdq.jpg" alt="avatar" width="25" height="25" />
+                        </div>
+                        <div class="d-flex flex-row align-items-center">
+                            <p class="small text-muted mb-0"><%= comment.createdAt.toLocaleString() %></p>
+                            <i class="far fa-thumbs-up mx-2 fa-xs text-body" style="margin-top: -0.16rem;"></i>
+                            <% if (locals.user) { %>
+                            <button class="btn btn-sm btn-danger" onclick="deleteComment('<%= comment._id %>')">Delete</button>
+                            <button class="btn btn-sm btn-info mx-1" onclick="toggleUpdateForm('<%= comment._id %>')">Update</button>
+                            <button class="btn btn-sm btn-success mx-1 d-none save-button" onclick="saveUpdatedComment('<%= comment._id %>')">Save</button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
     </div>
 
     <%- include('./partials/script') %>
-  </body>
+
+    <script>
+        function deleteComment(commentId) {
+            fetch(`/commentdelete/${commentId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    if (confirm("Are you sure you want to delete the comment?")) {
+                        document.getElementById(`comment-${commentId}`).remove();
+                    }
+                } else {
+                    console.error('Failed to delete comment');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function toggleUpdateForm(commentId) {
+            const commentElement = document.getElementById(`comment-${commentId}`);
+            const contentElement = commentElement.querySelector('.comment-content');
+            const inputElement = commentElement.querySelector('.update-input');
+            const saveButton = commentElement.querySelector('.save-button');
+
+            contentElement.classList.toggle('d-none');
+            inputElement.classList.toggle('d-none');
+            saveButton.classList.toggle('d-none');
+        }
+
+        function saveUpdatedComment(commentId) {
+            const commentElement = document.getElementById(`comment-${commentId}`);
+            const inputElement = commentElement.querySelector('.update-input');
+            const updatedContent = inputElement.value;
+
+            fetch(`/commentUpdate/${commentId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: updatedContent })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.msg === "Comment updated!") {
+                    const contentElement = commentElement.querySelector('.comment-content');
+                    contentElement.textContent = updatedContent;
+                    toggleUpdateForm(commentId);
+                } else {
+                    alert('Failed to update comment');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
 </html>

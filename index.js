@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const { checkForAuthenticationCookie } = require("./middlewares/authentication");
 const Blog = require("./models/blog");
 const Category = require("./models/categories");
+const Comment = require("./models/Comment");
 
 const app = express(); 
 const PORT = process.env.PORT || 4000;
@@ -46,6 +47,7 @@ app.get('/', async (req, res) => {
     ];
   }
 
+
   const allblog = await Blog.find(filter);
   let message = null;
   if (allblog.length === 0) {
@@ -53,6 +55,49 @@ app.get('/', async (req, res) => {
   }
   res.render('home', { user: req.user, blogs: allblog, message  , blog:Blog.Tags});
 });
+app.delete("/commentdelete/:commentId", async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const comment = await Comment.findByIdAndDelete(commentId);
+
+    if (!comment) {
+      return res.status(404).send({ msg: "Comment not found!" });
+    }
+
+    res.status(200).send({ msg: "Comment deleted!" });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).send({ msg: 'Comment not deleted' });
+  }
+});
+
+app.patch("/commentUpdate/:commentId", async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { content } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).send({ msg: "Invalid comment ID!" });
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(
+      commentId,
+      { $set: { content } },
+      { new: true }
+    );
+
+    if (!updatedComment) {
+      return res.status(404).send({ msg: "Comment not found!" });
+    }
+
+    res.status(200).send({ msg: "Comment updated!", comment: updatedComment });
+  } catch (error) {
+    console.error('Error updating comment:', error);
+    res.status(500).send({ msg: 'Comment not updated' });
+  }
+});
+
+
 
 app.get('/categories', async (req, res) => { 
   let filter = { categories: req.query.categories };
