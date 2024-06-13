@@ -49,6 +49,53 @@ router.post("/", upload.single('uploadImage'), async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+// Middleware to check authentication
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+}
+
+router.delete('/blogDelete/:blogId', ensureAuthenticated, async (req, res) => {
+    try {
+        const { blogId } = req.params;
+        const blogPost = await Blog.findById(blogId);
+
+        if (!blogPost) {
+            return res.status(404).send({ msg: "Post Not Found" });
+        }
+
+        if (blogPost.user.toString() !== req.user._id.toString()) {
+            return res.status(403).send({ msg: "This post is not owned by you" });
+        }
+
+        await Blog.findByIdAndDelete(blogId);
+        res.status(200).send({ msg: "Post Deleted" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ msg: "Post Not Deleted" });
+    }
+});
+router.patch("blogUpdate/:blogId",async (req,res)=>{
+    try {
+        const {blogId} = req.params;
+        const {title,body} = req.body
+    
+        if (!mongoose.Types.ObjectId.isValid(blogId)) {
+            return res.status(400).send({ msg: "Invalid blogId!" });
+          }
+          const PostUpdate = await Blog.findByIdAndUpdate(blogId ,{$set:{title,body}},{new:true})
+          if (PostUpdate) {
+            return res.status(400).send({ msg: "BlogPost Not Found!" });
+          }
+          res.status(200).send({ msg: "BlogPost updated!",  });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({msg:"Post Not Update "}) 
+    }
+   
+})
 router.get('/:id', async (req, res) => {
     try {
         const blog = await Blog.findById(req.params.id);

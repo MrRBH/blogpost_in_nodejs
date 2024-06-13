@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>RB-Blogs</title>
     <%- include('./partials/head') %>
@@ -50,32 +49,32 @@
         .form-control {
             border-radius: 5px;
         }
-        .text-underlined{
+
+        .text-underlined {
             text-decoration: underline;
         }
-        .decoration-none{
-            text-decoration:none;
+
+        .decoration-none {
+            text-decoration: none;
             color: black;
         }
-        .category-select{
+
+        .category-select {
             width: 400px;
         }
     </style>
 </head>
-
 <body>
     <%- include('./partials/navbar') %>
     <div class="container">
-        <div class=" d-flex ">
-
+        <div class="d-flex">
             <div class="mb-3 category-select">
                 <form method="GET" action="/">
                     <label for="Search">Search</label>
                     <input type="text" class="form-control" name="search" placeholder="Search for blogs">
                 </form>
             </div>
-
-            <div class="mb-3 category-select  mx-5 ">
+            <div class="mb-3 category-select mx-5">
                 <form method="GET" action="/">
                     <label for="Category">Category</label>
                     <select class="form-control" id="category" name="categories" onchange="this.form.submit()">
@@ -88,8 +87,6 @@
                     </select>
                 </form>
             </div>
-
-
         </div>
 
         <div class="row" style="min-height: 200px;">
@@ -99,33 +96,106 @@
             </div>
             <% } else { %>
             <% blogs.forEach(blog => { %>
-                <div class="col-md-4 mb-4">
-                <a href="/blog/<%= blog._id %>" class="decoration-none">
+            <div class="col-md-4 mb-4" id="post-<%= blog._id %>">
                 <div class="card h-100">
                     <img src="/<%= blog.CoverImage %>" class="card-img-top responsive" alt="Blog Cover Image">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title"><%= blog.title %></h5>
-                        <p class="card-text"><%= blog.body.substring(0, 100) %>...</p>
+                        <h5 class="card-title blog-title"><%= blog.title %></h5>
+                        <input type="text" class="form-control update-title-input d-none" value="<%= blog.title %>">
+                        <textarea class="form-control update-body-input d-none"><%= blog.body %></textarea>
+                        <p class="card-text blog-title"><%= blog.body.substring(0, 50) %>...</p>
+                        <div class="my-1">
+                            <% if (locals.user) { %>
+                            <button class="btn btn-sm btn-danger" onclick="deletePost('<%= blog._id %>')">Delete</button>
+                            <button class="btn btn-sm btn-info mx-1" onclick="toggleUpdateBlog('<%= blog._id %>')">Update</button>
+                            <button class="btn btn-sm btn-success mx-1 d-none save-button" onclick="saveUpdatedBlog('<%= blog._id %>')">Save</button>
+                            <% } %>
+                        </div>
                         <a href="/blog/<%= blog._id %>" class="btn btn-primary mt-auto">View</a>
-                        <div class="tags my-3 ">
+                        <div class="tags my-3">
                             <% if (blog.Tags) { %>
-                                <% blog.Tags.split(',').forEach(tag => { %>
-                                    <button class="btn btn-primary text-underlined  my-1">#<%= tag.trim() %></button>
-                                <% }) %>
+                            <% blog.Tags.split(',').forEach(tag => { %>
+                            <button class="btn btn-primary text-underlined my-1">#<%= tag.trim() %></button>
+                            <% }) %>
                             <% } %>
                         </div>
                     </div>
+                   
                 </div>
-            </a>
             </div>
             <% }) %>
             <% } %>
         </div>
-        
+
         <%=locals.msg %>
     </div>
 
     <%- include('./partials/script') %>
-</body>
 
+    <script>
+        function deletePost(blogId) {
+            fetch(`/blogDelete/${blogId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById(`post-${blogId}`).remove();
+                } else {
+                    console.error('Failed to delete post');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function toggleUpdateBlog(blogId) {
+            const blogElement = document.getElementById(`post-${blogId}`);
+            const titleElement = blogElement.querySelector('.blog-title');
+            const bodyElement = blogElement.querySelector('.blog-content');
+            const titleInput = blogElement.querySelector('.update-title-input');
+            const bodyInput = blogElement.querySelector('.update-body-input');
+            const saveButton = blogElement.querySelector('.save-button');
+
+            titleElement.classList.toggle('d-none');
+            bodyElement.classList.toggle('d-none');
+            titleInput.classList.toggle('d-none');
+            bodyInput.classList.toggle('d-none');
+            saveButton.classList.toggle('d-none');
+        }
+
+        function saveUpdatedBlog(blogId) {
+            const blogElement = document.getElementById(`post-${blogId}`);
+            const titleInput = blogElement.querySelector('.update-title-input');
+            const bodyInput = blogElement.querySelector('.update-body-input');
+            const updatedTitle = titleInput.value;
+            const updatedBody = bodyInput.value;
+        
+            fetch(`/blogUpdate/${blogId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: updatedTitle, body: updatedBody })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update blog post');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.msg === "BlogPost updated!") {
+                    const titleElement = blogElement.querySelector('.comment-title');
+                    const bodyElement = blogElement.querySelector('.comment-content');
+                    titleElement.textContent = updatedTitle;
+                    bodyElement.textContent = updatedBody;
+                    toggleUpdateBlog(blogId); // Hide input fields and show text content
+                } else {
+                    alert('Failed to update blog post');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+    </script>
+</body>
 </html>

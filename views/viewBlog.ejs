@@ -86,7 +86,7 @@
             const commentElement = document.getElementById(`comment-${commentId}`);
             const inputElement = commentElement.querySelector('.update-input');
             const updatedContent = inputElement.value;
-
+        console.log("saved")
             fetch(`/commentUpdate/${commentId}`, {
                 method: 'PATCH',
                 headers: {
@@ -94,18 +94,24 @@
                 },
                 body: JSON.stringify({ content: updatedContent })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response) {
+                    throw new Error('Failed to update comment');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.msg === "Comment updated!") {
                     const contentElement = commentElement.querySelector('.comment-content');
                     contentElement.textContent = updatedContent;
-                    toggleUpdateForm(commentId);
+                    toggleUpdateForm(commentId); // Hide input fields and show text content
                 } else {
                     alert('Failed to update comment');
                 }
             })
             .catch(error => console.error('Error:', error));
         }
+        
     </script>
 </body>
 </html>

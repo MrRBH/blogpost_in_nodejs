@@ -10,7 +10,7 @@ const Blog = require("./models/blog");
 const Category = require("./models/categories");
 const Comment = require("./models/Comment");
 
-const app = express(); 
+const app = express();  
 const PORT = process.env.PORT || 4000;
 
 // Connect to MongoDB
@@ -49,12 +49,30 @@ app.get('/', async (req, res) => {
 
 
   const allblog = await Blog.find(filter);
-  let message = null;
+  let message = null; 
   if (allblog.length === 0) {
     message = "Posts Not Found";
   }
   res.render('home', { user: req.user, blogs: allblog, message  , blog:Blog.Tags});
 });
+app.delete('/blogDelete/:blogId', async (req, res) => {
+  try {
+      const { blogId } = req.params;
+      if (!blogId) {
+          throw new Error("Invalid ID");
+      }
+      const deletePost = await Blog.findByIdAndDelete(blogId);
+      if (!deletePost) {
+          console.log("Post Not Found");
+          return res.status(404).send({ msg: "Post Not Found" });
+      }
+      res.status(200).send({ msg: "Post Deleted" });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "Post Not Deleted" });
+  }
+});
+
 app.delete("/commentdelete/:commentId", async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -70,7 +88,7 @@ app.delete("/commentdelete/:commentId", async (req, res) => {
     res.status(500).send({ msg: 'Comment not deleted' });
   }
 });
-
+// comment Update 
 app.patch("/commentUpdate/:commentId", async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -82,13 +100,12 @@ app.patch("/commentUpdate/:commentId", async (req, res) => {
 
     const updatedComment = await Comment.findByIdAndUpdate(
       commentId,
-      { $set: { content } },
-      { new: true }
+           {content:req.body.content}
     );
 
     if (!updatedComment) {
       return res.status(404).send({ msg: "Comment not found!" });
-    }
+    } 
 
     res.status(200).send({ msg: "Comment updated!", comment: updatedComment });
   } catch (error) {
@@ -96,6 +113,34 @@ app.patch("/commentUpdate/:commentId", async (req, res) => {
     res.status(500).send({ msg: 'Comment not updated' });
   }
 });
+// blgoUpdate
+app.patch("/blogUpdate/:blogId", async (req, res) => {
+  try {
+      const { blogId } = req.params;
+      const { title, body } = req.body;
+
+      if (!mongoose.Types.ObjectId.isValid(blogId)) {
+          return res.status(400).send({ msg: "Invalid blogId!" });
+      }
+
+      const updatedPost = await Blog.findByIdAndUpdate(
+          blogId,
+          { $set: { title, body } },
+          { new: true } // Ensure `new: true` to return the updated document
+      );
+
+      if (!updatedPost) {
+          return res.status(404).send({ msg: "BlogPost Not Found!" });
+      }
+
+      res.status(200).json({ msg: "BlogPost updated!", updatedPost });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "Post Not Updated" });
+  }
+});
+
+
 
 
 
