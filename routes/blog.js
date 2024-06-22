@@ -21,8 +21,9 @@ const upload = multer({ storage });
 
 router.get("/add-new", async (req, res) => {
     try {
+        const blog  = await Blog.find()
         const categories = await Category.find(); // Fetch categories from the database
-        res.render("addBlog", { user: req.user, categories }); // Pass categories to the view
+        res.render("addBlog", { user: req.user, categories ,blog}); // Pass categories to the view
     } catch (error) {
         console.error('Error fetching categories:', error);
         res.status(500).send('Server Error');
@@ -127,6 +128,56 @@ router.post("/comment/:blogId", async (req, res) => {
     }
 });
 
+//likes
+// POST route to like a blog post
+router.post('/like/:blogId', async (req, res) => {
+    const { blogId } = req.params;
+    const userId = req.user._id; // Assuming userId is available in req.user
+
+    try {
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            return res.status(404).json({ error: 'Blog not found' });
+        }
+
+        if (!blog.likes.includes(userId)) {
+            blog.likes.push(userId);
+            blog.likesCount += 1;
+            await blog.save();
+            res.json({ success: true, updatedBlog: blog });
+        } else {
+            res.json({ success: false, message: 'Already liked' });
+        }
+    } catch (err) {
+        console.error('Error liking blog:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// POST route to unlike a blog post
+router.post('/unlike/:blogId', async (req, res) => {
+    const { blogId } = req.params;
+    const userId = req.user._id; // Assuming userId is available in req.user
+
+    try {
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            return res.status(404).json({ error: 'Blog not found' });
+        }
+
+        if (blog.likes.includes(userId)) {
+            blog.likes.pull(userId); // Remove userId from likes array
+            blog.likesCount -= 1;
+            await blog.save();
+            res.json({ success: true, updatedBlog: blog });
+        } else {
+            res.json({ success: false, message: 'Not liked yet' });
+        }
+    } catch (err) {
+        console.error('Error unliking blog:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 router.post("/category/:blogId",async(req,res)=>{
     try {

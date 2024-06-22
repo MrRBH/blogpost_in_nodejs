@@ -25,11 +25,12 @@ router.post("/signin", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { fullname, email, password } = req.body;
+  const { fullname, email, password ,role } = req.body;
   await User.create({
     fullname,
     email,
     password,
+    role
   });
   return res.redirect("/user/signin");
 });

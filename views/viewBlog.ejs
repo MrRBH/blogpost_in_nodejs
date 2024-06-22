@@ -20,15 +20,15 @@
     <div class="container mt-3">
         <% if (locals.user) { %>
         <form action="/blog/comment/<%= blog.id %>" method="post">
-            <div class="mb-3 col-md-4">
+            <div class="mb-3 col-md-6">
                 <input type="text" name="content" class="form-control" placeholder="Enter your comment" />
-                <button class="btn btn-sm btn-success  mt-1" type="submit">comment</button>
+                <button class="btn btn-sm btn-success mt-1" type="submit">Comment</button>
             </div>
         </form>
         <% } %>
         <div class="mt-3">
             <% comments.forEach(comment => { %>
-            <div class="card mb-4 col-md-4" id="comment-<%= comment._id %>">
+            <div class="card mb-4 col-md-6" id="comment-<%= comment._id %>">
                 <div class="card-body">
                     <pre class="comment-content"><%= comment.content %></pre>
                     <input type="text" class="form-control update-input d-none" value="<%= comment.content %>"/>
@@ -56,14 +56,14 @@
 
     <script>
         function deleteComment(commentId) {
+            if (!confirm("Are you sure you want to delete the comment?")) return;
+            
             fetch(`/commentdelete/${commentId}`, {
                 method: 'DELETE'
             })
             .then(response => {
                 if (response.ok) {
-                    if (confirm("Are you sure you want to delete the comment?")) {
-                        document.getElementById(`comment-${commentId}`).remove();
-                    }
+                    document.getElementById(`comment-${commentId}`).remove();
                 } else {
                     console.error('Failed to delete comment');
                 }
@@ -86,7 +86,9 @@
             const commentElement = document.getElementById(`comment-${commentId}`);
             const inputElement = commentElement.querySelector('.update-input');
             const updatedContent = inputElement.value;
-        console.log("saved")
+        
+            console.log(`Saving updated comment with ID: ${commentId} and content: ${updatedContent}`);
+        
             fetch(`/commentUpdate/${commentId}`, {
                 method: 'PATCH',
                 headers: {
@@ -94,23 +96,21 @@
                 },
                 body: JSON.stringify({ content: updatedContent })
             })
-            .then(response => {
-                if (!response) {
-                    throw new Error('Failed to update comment');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.msg === "Comment updated!") {
                     const contentElement = commentElement.querySelector('.comment-content');
                     contentElement.textContent = updatedContent;
-                    toggleUpdateForm(commentId); // Hide input fields and show text content
+                    toggleUpdateForm(commentId);
+                    console.log(`Updated comment successfully saved`);
                 } else {
                     alert('Failed to update comment');
+                    console.log(`Failed to update comment: ${data.msg}`);
                 }
             })
             .catch(error => console.error('Error:', error));
         }
+        
         
     </script>
 </body>

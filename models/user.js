@@ -3,7 +3,7 @@ const { Schema, model } = require('mongoose');
 const { createTokenForUser } = require('../services/authentication');
 
 const UserSchema = new Schema(
-  {
+  { 
     fullname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     salt: { type: String },

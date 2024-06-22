@@ -89,27 +89,43 @@
             </div>
         </div>
 
-        <div class="row" style="min-height: 200px;">
+        <div class="row">
             <% if (message) { %>
             <div class="col-12 d-flex justify-content-center align-items-center">
                 <h4><%= message %></h4>
             </div>
             <% } else { %>
             <% blogs.forEach(blog => { %>
-            <div class="col-md-4 mb-4" id="post-<%= blog._id %>">
+            <div class="col-md-4 mb-4 mt-1" id="post-<%= blog._id %>">
                 <div class="card h-100">
                     <img src="/<%= blog.CoverImage %>" class="card-img-top responsive" alt="Blog Cover Image">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title blog-title"><%= blog.title %></h5>
                         <input type="text" class="form-control update-title-input d-none" value="<%= blog.title %>">
                         <textarea class="form-control update-body-input d-none"><%= blog.body %></textarea>
-                        <p class="card-text blog-title"><%= blog.body.substring(0, 50) %>...</p>
-                        <div class="my-1">
-                            <% if (locals.user) { %>
-                            <button class="btn btn-sm btn-danger" onclick="deletePost('<%= blog._id %>')">Delete</button>
-                            <button class="btn btn-sm btn-info mx-1" onclick="toggleUpdateBlog('<%= blog._id %>')">Update</button>
-                            <button class="btn btn-sm btn-success mx-1 d-none save-button" onclick="saveUpdatedBlog('<%= blog._id %>')">Save</button>
-                            <% } %>
+                        <p class="card-text blog-content"><%= blog.body.substring(0, 50) %>...</p>
+                        <div class="my-1 d-flex justify-content-between align-items-center">
+                            <div>
+                                <% if (locals.user) { %>
+                                <button class="btn btn-sm btn-danger" onclick="deletePost('<%= blog._id %>')">Delete</button>
+                                <button class="btn btn-sm btn-info mx-1" onclick="toggleUpdateBlog('<%= blog._id %>')">Update</button>
+                                <button class="btn btn-sm btn-success mx-1 d-none save-button" onclick="saveUpdatedBlog('<%= blog._id %>')">Save</button>
+                                <% } %>
+                            </div>
+                            <div>
+                                <% if (locals.user) { %>
+                                    <div id="like-container-<%= blog._id %>" style="cursor: pointer;" onclick="toggleLike('<%= blog._id %>')">
+                                        <% if (locals.user && blog.likes.includes(locals.user._id)) { %>
+                                            <img id="like-icon-<%= blog._id %>" class="like-icon liked" width="28" height="28" src="https://img.icons8.com/color/48/000000/like.png" alt="liked"/>
+                                        <% } else { %>
+                                            <img id="like-icon-<%= blog._id %>" class="like-icon" width="30" height="30" src="https://img.icons8.com/ios/50/like--v1.png" alt="like"/>
+                                        <% } %>
+                                        <span id="likes-count-<%= blog._id %>"><%= blog.likesCount %></span>
+                                    </div>  
+                                <% } %>
+                               
+                                
+                            </div>
                         </div>
                         <a href="/blog/<%= blog._id %>" class="btn btn-primary mt-auto">View</a>
                         <div class="tags my-3">
@@ -120,14 +136,13 @@
                             <% } %>
                         </div>
                     </div>
-                   
                 </div>
             </div>
             <% }) %>
             <% } %>
         </div>
 
-        <%=locals.msg %>
+        <%= locals.msg %>
     </div>
 
     <%- include('./partials/script') %>
@@ -149,25 +164,29 @@
 
         function toggleUpdateBlog(blogId) {
             const blogElement = document.getElementById(`post-${blogId}`);
+            if (!blogElement) return; // Exit if the element is not found
+        
             const titleElement = blogElement.querySelector('.blog-title');
             const bodyElement = blogElement.querySelector('.blog-content');
             const titleInput = blogElement.querySelector('.update-title-input');
             const bodyInput = blogElement.querySelector('.update-body-input');
             const saveButton = blogElement.querySelector('.save-button');
-
-            titleElement.classList.toggle('d-none');
-            bodyElement.classList.toggle('d-none');
-            titleInput.classList.toggle('d-none');
-            bodyInput.classList.toggle('d-none');
-            saveButton.classList.toggle('d-none');
+        
+            if (titleElement) titleElement.classList.toggle('d-none');
+            if (bodyElement) bodyElement.classList.toggle('d-none');
+            if (titleInput) titleInput.classList.toggle('d-none');
+            if (bodyInput) bodyInput.classList.toggle('d-none');
+            if (saveButton) saveButton.classList.toggle('d-none');
         }
 
         function saveUpdatedBlog(blogId) {
             const blogElement = document.getElementById(`post-${blogId}`);
+            if (!blogElement) return; // Exit if the element is not found
+        
             const titleInput = blogElement.querySelector('.update-title-input');
             const bodyInput = blogElement.querySelector('.update-body-input');
-            const updatedTitle = titleInput.value;
-            const updatedBody = bodyInput.value;
+            const updatedTitle = titleInput ? titleInput.value : null;
+            const updatedBody = bodyInput ? bodyInput.value : null;
         
             fetch(`/blogUpdate/${blogId}`, {
                 method: 'PATCH',
@@ -184,18 +203,60 @@
             })
             .then(data => {
                 if (data.msg === "BlogPost updated!") {
-                    const titleElement = blogElement.querySelector('.comment-title');
-                    const bodyElement = blogElement.querySelector('.comment-content');
-                    titleElement.textContent = updatedTitle;
-                    bodyElement.textContent = updatedBody;
-                    toggleUpdateBlog(blogId); // Hide input fields and show text content
+                    const titleElement = blogElement.querySelector('.blog-title');
+                    const bodyElement = blogElement.querySelector('.blog-content');
+                    if (titleElement) titleElement.textContent = updatedTitle;
+                    if (bodyElement) bodyElement.textContent = updatedBody.substring(0, 50) + '...';
+                    toggleUpdateBlog(blogId);
                 } else {
                     alert('Failed to update blog post');
                 }
             })
             .catch(error => console.error('Error:', error));
         }
+
+        function toggleLike(blogId) {
+            const blogElement = document.getElementById(`post-${blogId}`);
+            if (!blogElement) return; // Exit if the element is not found
         
+            const likeIconElement = blogElement.querySelector('.like-icon');
+            const likesCountElement = blogElement.querySelector(`#likes-count-${blogId}`);
+            const isLiked = likeIconElement.classList.contains('liked');
+        
+            const url = isLiked ? `/blog/unlike/${blogId}` : `/blog/like/${blogId}`;
+        
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to toggle like status');
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    if (isLiked) {
+                        likeIconElement.classList.remove('liked');
+                        likeIconElement.src = "https://img.icons8.com/ios/50/like--v1.png";
+                        likesCountElement.textContent = parseInt(likesCountElement.textContent) - 1;
+                    } else {
+                        likeIconElement.classList.add('liked');
+                        likeIconElement.src = "https://img.icons8.com/color/48/000000/like.png";
+                        likesCountElement.textContent = parseInt(likesCountElement.textContent) + 1;
+                    }
+                } else {
+                    console.error('Failed to toggle like status');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
+    <%- include('./partials/footer') %>
 </body>
 </html>
