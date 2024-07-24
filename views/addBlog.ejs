@@ -114,7 +114,7 @@
                         </td>
                         <% } %>
                         <td>
-                            <a href="/view/post/<%= post._id %>" class="text-decoration-none text-black"><%= post.title %></a>
+                            <a href="/view/post/<%= post.title %>" class="text-decoration-none text-black"><%= post.title %></a>
                         </td>
                         <td><%= post.Active ? 'Published' : 'Not Published' %></td>
                         <% if (user.role === 'ADMIN') { %>

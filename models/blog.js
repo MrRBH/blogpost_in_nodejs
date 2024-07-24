@@ -16,7 +16,7 @@ const blogSchema = new Schema({
     categories: {
         type: String,
         required: true,
-        unique: true
+        
     },
     Tags: {
         type: String,

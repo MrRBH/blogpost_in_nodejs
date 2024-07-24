@@ -32,7 +32,7 @@ router.get("/add-new", async (req, res) => {
 
 router.post("/", upload.single('uploadImage'), async (req, res) => {
     try {
-        const { title, body, category } = req.body;
+        const { title, body, categories, Active } = req.body;
         const blog = new Blog({
             title,
             body,
@@ -47,7 +47,7 @@ router.post("/", upload.single('uploadImage'), async (req, res) => {
         res.redirect(`/blog/${blog._id}`);
     } catch (error) {
         console.error('Error creating blog post:', error);
-        res.status(500).send('Server Error');
+        res.status(500).send('Server Error of category');
     }
 });
 // Middleware to check authentication
@@ -206,3 +206,4 @@ router.post("/category/:blogId",async(req,res)=>{
 
 
 module.exports = router;
+ 
